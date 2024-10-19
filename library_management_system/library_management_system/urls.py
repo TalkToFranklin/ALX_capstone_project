@@ -27,10 +27,10 @@ router.register(r'transactions', TransactionViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls), # Admin site URL
-    path('api/', include(router.urls)),  # Include API URLs
+    path('api/', include('api.urls')), # Include API URLs
+    path('api/', include(router.urls)), 
 
     # JWT Authentication URLs
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
-    path('', include('api.urls')),
 ]
