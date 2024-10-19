@@ -44,26 +44,64 @@ class LibraryUserViewSet(viewsets.ModelViewSet):
 
 class TransactionViewSet(viewsets.ViewSet):
     queryset = Transaction.objects.all()
+    permission_classes = [IsAuthenticated]
 
     serializer_class = TransactionSerializer
 
-    def checkout(self, request, pk=None):
-        book = Book.objects.get(pk=pk)
-        user = request.user.libraryuser
+    def checkout(self, request):
+        book_id = request.data.get('book_id') # Get book_id from request data
+        user = request.user.libraryuser # Get the logged-in user
+        if not book_id:
+            return Response({"error": "Book ID is required."}, status=status.HTTP_400_BAD_REQUEST)
         
-        if book.copies_available > 0:
+        # Checkout logic before creating endpoints
+
+        # if book.copies_available > 0:
+        #     book.copies_available -= 1
+        #     book.save()
+        #     transaction = Transaction.objects.create(book=book, user=user)
+        #     return Response(TransactionSerializer(transaction).data, status=status.HTTP_201_CREATED)
+        
+        # return Response({"error": "No copies available."}, status=status.HTTP_400_BAD_REQUEST)
+
+        #new checkout logic
+
+        try:
+            book = Book.objects.get(id=book_id)
+
+            if book.copies_available <= 0:
+                return Response({"error": "No available copies for checkout."}, status=status.HTTP_400_BAD_REQUEST)
+
+            # Check if the user already has a checked-out book
+            if Transaction.objects.filter(user=user, return_date__isnull=True).exists():
+                return Response({"error": "User already has a book checked out."}, status=status.HTTP_403_FORBIDDEN)
+
+            # Create transaction
+            transaction = Transaction.objects.create(book=book, user=user)
             book.copies_available -= 1
             book.save()
-            transaction = Transaction.objects.create(book=book, user=user)
-            return Response(TransactionSerializer(transaction).data, status=status.HTTP_201_CREATED)
-        
-        return Response({"error": "No copies available."}, status=status.HTTP_400_BAD_REQUEST)
 
-    def return_book(self, request, pk=None):
-        transaction = Transaction.objects.get(pk=pk)
-        transaction.return_date = timezone.now()
-        transaction.book.copies_available += 1
-        transaction.book.save()
-        transaction.save()
+            return Response(TransactionSerializer(transaction).data, status=status.HTTP_201_CREATED)
+
+        except Book.DoesNotExist:
+            return Response({"error": "Book not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+    def return_book(self, request):
+        transaction_id = request.data.get('transaction_id') # Get transaction_id from request data
+
+        try:
+            transaction = Transaction.objects.get(id=transaction_id)
+
+            if transaction.return_date is not None:
+                return Response({"error": "This book has already been returned."}, status=status.HTTP_400_BAD_REQUEST)
+
+            transaction.return_date = timezone.now()
+            transaction.book.copies_available += 1
+            transaction.book.save()
+            transaction.save()
         
-        return Response({"message": "Book returned successfully."}, status=status.HTTP_200_OK)
+            return Response({"message": "Book returned successfully."}, status=status.HTTP_200_OK)
+    
+        except Transaction.DoesNotExist:
+            return Response({"error": "Transaction not found."}, status=status.HTTP_404_NOT_FOUND)
