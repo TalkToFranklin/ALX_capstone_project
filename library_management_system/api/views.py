@@ -9,6 +9,10 @@ from rest_framework.response import Response
 from .models import Book, LibraryUser, Transaction
 from .serializers import BookSerializer, LibraryUserSerializer, TransactionSerializer
 from django.utils import timezone
+from django.http import HttpResponse
+
+def home(request):
+    return HttpResponse("<h1>Welcome to Franklin's Library Management System API!</h1>")
  
 
 class BookViewSet(viewsets.ModelViewSet):
@@ -39,6 +43,9 @@ class LibraryUserViewSet(viewsets.ModelViewSet):
     serializer_class = LibraryUserSerializer
 
 class TransactionViewSet(viewsets.ViewSet):
+    queryset = Transaction.objects.all()
+
+    serializer_class = TransactionSerializer
 
     def checkout(self, request, pk=None):
         book = Book.objects.get(pk=pk)
