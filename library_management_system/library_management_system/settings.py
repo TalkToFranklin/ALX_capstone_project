@@ -90,8 +90,12 @@ WSGI_APPLICATION = 'library_management_system.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'library_management',
+        'USER': 'franklin',  # MySQL username (renamed for this database although same name)
+        'PASSWORD': 'your_password', # MySQL password for this database
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 

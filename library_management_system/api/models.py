@@ -13,6 +13,7 @@ class Book(models.Model):
     isbn = models.CharField(max_length=13, unique=True)
     published_date = models.DateField()
     copies_available = models.PositiveIntegerField(default=0)
+    genre = models.CharField(max_length=100, null=True)
 
     def __str__(self):
         return self.title

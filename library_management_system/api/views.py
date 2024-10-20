@@ -10,10 +10,20 @@ from .models import Book, LibraryUser, Transaction
 from .serializers import BookSerializer, LibraryUserSerializer, TransactionSerializer
 from django.utils import timezone
 from django.http import HttpResponse
+from django.shortcuts import render
 
 def home(request):
     return HttpResponse("<h1>Welcome to Franklin's Library Management System API!</h1>")
  
+
+def book_list(request):
+    books = Book.objects.all()  # Fetch all books from the database
+    return render(request, 'book_list.html', {'books': books})
+
+def user_list(request):
+    users = LibraryUser.objects.all()  # Fetch all library users from the database
+    return render(request, 'user_list.html', {'users': users})
+
 
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
