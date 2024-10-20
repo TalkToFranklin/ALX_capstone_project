@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from api.views import BookViewSet, LibraryUserViewSet, TransactionViewSet
+from api.views import home, BookViewSet, LibraryUserViewSet, TransactionViewSet
 
 router = DefaultRouter()
 router.register(r'books', BookViewSet)
@@ -33,4 +33,5 @@ urlpatterns = [
     # JWT Authentication URLs
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('', home, name='home'), # Home route for the welcome message
 ]
