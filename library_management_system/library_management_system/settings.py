@@ -52,6 +52,9 @@ REST_FRAMEWORK = {
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.OrderingFilter',
     ),
+    'DEFAULT_PERMISSION_CLASSES': (
+        'rest_framework.permissions.IsAuthenticated',
+    ),
 }
 
 MIDDLEWARE = [
@@ -119,7 +122,7 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),  # Set access token lifetime
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),  # Set access token lifetime
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),     # Set refresh token lifetime
     'ROTATE_REFRESH_TOKENS': True,                    # Rotate refresh tokens
     'BLACKLIST_AFTER_ROTATION': True,                 # Blacklist old refresh tokens after rotation

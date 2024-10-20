@@ -137,52 +137,60 @@ class TransactionViewSet(viewsets.ViewSet):
             return Response({"error": "Transaction not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
+class AvailableBooksView(APIView):
+    permission_classes = [IsAuthenticated]  # Ensure only authenticated users can access this view
+
+    def get(self, request):
+        available_books = Book.objects.filter(available_copies__gt=0)  # Adjust based on your model logic
+        serializer = BookSerializer(available_books, many=True)
+        return Response(serializer.data)
+
 
 class RegisterView(APIView):
-    def get(self, request):
-        form = UserRegisterForm()
-        return render(request, 'register.html', {'form': form})
+    # def get(self, request):
+    #     form = UserRegisterForm()
+    #     return render(request, 'register.html', {'form': form})
     
     def post(self, request):
-        form = UserRegisterForm(request.POST)
-        if form.is_valid():
-            user = form.save(commit=False)
-            user.set_password(form.cleaned_data['password'])
-            user.save()
-            return render(request, 'registration_success.html', {'username': user.username})
-        return render(request, 'register.html', {'form': form})
+        # form = UserRegisterForm(request.POST)
+        # if form.is_valid():
+        #     user = form.save(commit=False)
+        #     user.set_password(form.cleaned_data['password'])
+        #     user.save()
+        #     return render(request, 'registration_success.html', {'username': user.username})
+        # return render(request, 'register.html', {'form': form})
         
-        """ serializer = UserRegisterSerializer(data=request.data)
+        serializer = UserRegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
             return Response({"message": "User registered successfully."}, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) """
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
-    def get(self, request):
-        form = UserLoginForm()
-        return render(request, 'login.html', {'form': form})
+    # def get(self, request):
+    #     form = UserLoginForm()
+    #     return render(request, 'login.html', {'form': form})
     
     def post(self, request):
-        form = UserLoginForm(request.POST)
-        if form.is_valid():
-            username = form.cleaned_data['username']
-            password = form.cleaned_data['password']
-            user = authenticate(username=username, password=password)
+        # form = UserLoginForm(request.POST)
+        # if form.is_valid():
+        #     username = form.cleaned_data['username']
+        #     password = form.cleaned_data['password']
+        #     user = authenticate(username=username, password=password)
             
-            if user is not None:
-                login(request, user)  # Log the user in
-                refresh = RefreshToken.for_user(user)
-                return render(request, 'login_success.html', {
-                    'refresh': str(refresh),
-                    'access': str(refresh.access_token),
-                })
-            return render(request, 'login.html', {'form': form, 'error': "Invalid credentials."})
+        #     if user is not None:
+        #         login(request, user)  # Log the user in
+        #         refresh = RefreshToken.for_user(user)
+        #         return render(request, 'login_success.html', {
+        #             'refresh': str(refresh),
+        #             'access': str(refresh.access_token),
+        #         })
+        #     return render(request, 'login.html', {'form': form, 'error': "Invalid credentials."})
         
-        return render(request, 'login.html', {'form': form})
+        # return render(request, 'login.html', {'form': form})
         
         
-        """ serializer = UserLoginSerializer(data=request.data)
+        serializer = UserLoginSerializer(data=request.data)
         if serializer.is_valid():
             username = serializer.validated_data['username']
             password = serializer.validated_data['password']
@@ -196,7 +204,7 @@ class LoginView(APIView):
                 })
             return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
         
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) """
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # FBV for register and login
