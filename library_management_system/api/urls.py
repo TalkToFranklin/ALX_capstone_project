@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import home, BookViewSet, LibraryUserViewSet, TransactionViewSet, book_list, user_list # Import the views I want to include
+from .views import home, BookViewSet, LibraryUserViewSet, TransactionViewSet, BookListView, UserListView # Import the views I want to include
 
 # Create a router and register my viewsets with it.
 router = DefaultRouter()
@@ -23,8 +23,8 @@ urlpatterns = [
     path('users/', LibraryUserViewSet.as_view({'get': 'list'}), name='user-list'),  # Example for listing users
 
     # Paths for book list and user list views
-    path('view/books/', book_list, name='book_list'),  # Path for viewing all books
-    path('view/users/', user_list, name='user_list'),  # Path for viewing all users
+    path('view/books/', BookListView.as_view(), name='book_list'),  # Path for viewing all books
+    path('view/users/', UserListView.as_view(), name='user_list'),  # Path for viewing all users
 
     path('transactions/', TransactionViewSet.as_view({'get': 'list'}), name='transaction-list'),
 ]

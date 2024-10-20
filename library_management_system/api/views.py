@@ -8,22 +8,37 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from .models import Book, LibraryUser, Transaction
 from .serializers import BookSerializer, LibraryUserSerializer, TransactionSerializer
+from django.views import View
 from django.utils import timezone
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import render
 
 def home(request):
     return HttpResponse("<h1>Welcome to Franklin's Library Management System API!</h1>")
  
 
-def book_list(request):
-    books = Book.objects.all()  # Fetch all books from the database
-    return render(request, 'book_list.html', {'books': books})
+# Function-Based View for book_list and user_list
+""" def book_list(request):
+    if request.method == 'GET':
+        books = Book.objects.all()  # Fetch all books from the database
+        return render(request, 'book_list.html', {'books': books})
 
 def user_list(request):
-    users = LibraryUser.objects.all()  # Fetch all library users from the database
-    return render(request, 'user_list.html', {'users': users})
+    if request.method == 'GET':
+        users = LibraryUser.objects.all()  # Fetch all library users from the database
+        return render(request, 'user_list.html', {'users': users}) """
 
+# Class-Based View for book_list and user_list
+
+class BookListView(View):
+    def get(self, request):
+        books = Book.objects.all().values()  # Fetch all books as dictionaries
+        return JsonResponse(list(books), safe=False)
+
+class UserListView(View):
+    def get(self, request):
+        users = LibraryUser.objects.all().values()  # Fetch all users as dictionaries
+        return JsonResponse(list(users), safe=False)
 
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
