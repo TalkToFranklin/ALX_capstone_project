@@ -141,7 +141,7 @@ class AvailableBooksView(APIView):
     permission_classes = [IsAuthenticated]  # Ensure only authenticated users can access this view
 
     def get(self, request):
-        available_books = Book.objects.filter(available_copies__gt=0)  # Adjust based on your model logic
+        available_books = Book.objects.filter(copies_available__gt=0)  
         serializer = BookSerializer(available_books, many=True)
         return Response(serializer.data)
 

@@ -1,7 +1,7 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import home, BookViewSet, LibraryUserViewSet, TransactionViewSet, BookListView, UserListView, RegisterView, LoginView # Import the views I want to include
+from .views import home, BookViewSet, LibraryUserViewSet, TransactionViewSet, BookListView, UserListView, RegisterView, LoginView, AvailableBooksView # Import the views I want to include
 
 # Create a router and register my viewsets with it.
 router = DefaultRouter()
@@ -16,6 +16,7 @@ urlpatterns = [
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'), # JWT token obtain route
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # JWT token refresh route
     path('api/', include(router.urls)), # Include router URLs for CRUD operations
+    path('books/available/', AvailableBooksView.as_view(), name='available_books'),
     
     # CRUD operations for books and users
     path('books/', BookViewSet.as_view({'get': 'list', 'post': 'create'}), name='book-list') ,  # Example for listing books
