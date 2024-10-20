@@ -6,12 +6,17 @@
 from rest_framework import viewsets, status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
+from rest_framework.decorators import api_view
+from django.contrib.auth import authenticate, login
+from rest_framework_simplejwt.tokens import RefreshToken
 from .models import Book, LibraryUser, Transaction
-from .serializers import BookSerializer, LibraryUserSerializer, TransactionSerializer
+from .serializers import BookSerializer, LibraryUserSerializer, TransactionSerializer, UserRegisterSerializer, UserLoginSerializer
 from django.views import View
 from django.utils import timezone
 from django.http import HttpResponse, JsonResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
+from rest_framework.views import APIView
+from .forms import UserRegisterForm, UserLoginForm
 
 def home(request):
     return HttpResponse("<h1>Welcome to Franklin's Library Management System API!</h1>")
@@ -130,3 +135,94 @@ class TransactionViewSet(viewsets.ViewSet):
     
         except Transaction.DoesNotExist:
             return Response({"error": "Transaction not found."}, status=status.HTTP_404_NOT_FOUND)
+
+
+
+class RegisterView(APIView):
+    def get(self, request):
+        form = UserRegisterForm()
+        return render(request, 'register.html', {'form': form})
+    
+    def post(self, request):
+        form = UserRegisterForm(request.POST)
+        if form.is_valid():
+            user = form.save(commit=False)
+            user.set_password(form.cleaned_data['password'])
+            user.save()
+            return render(request, 'registration_success.html', {'username': user.username})
+        return render(request, 'register.html', {'form': form})
+        
+        """ serializer = UserRegisterSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            return Response({"message": "User registered successfully."}, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) """
+
+class LoginView(APIView):
+    def get(self, request):
+        form = UserLoginForm()
+        return render(request, 'login.html', {'form': form})
+    
+    def post(self, request):
+        form = UserLoginForm(request.POST)
+        if form.is_valid():
+            username = form.cleaned_data['username']
+            password = form.cleaned_data['password']
+            user = authenticate(username=username, password=password)
+            
+            if user is not None:
+                login(request, user)  # Log the user in
+                refresh = RefreshToken.for_user(user)
+                return render(request, 'login_success.html', {
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                })
+            return render(request, 'login.html', {'form': form, 'error': "Invalid credentials."})
+        
+        return render(request, 'login.html', {'form': form})
+        
+        
+        """ serializer = UserLoginSerializer(data=request.data)
+        if serializer.is_valid():
+            username = serializer.validated_data['username']
+            password = serializer.validated_data['password']
+            user = authenticate(username=username, password=password)
+            
+            if user is not None:
+                refresh = RefreshToken.for_user(user)
+                return Response({
+                    'refresh': str(refresh),
+                    'access': str(refresh.access_token),
+                })
+            return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) """
+
+
+# FBV for register and login
+
+""" @api_view(['POST'])
+def register(request):
+    serializer = UserRegisterSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.save()
+        return Response({"message": "User registered successfully."}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def login(request):
+    serializer = UserLoginSerializer(data=request.data)
+    if serializer.is_valid():
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
+        user = authenticate(username=username, password=password)
+        
+        if user is not None:
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+            })
+        return Response({"error": "Invalid credentials."}, status=status.HTTP_401_UNAUTHORIZED)
+    
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) """

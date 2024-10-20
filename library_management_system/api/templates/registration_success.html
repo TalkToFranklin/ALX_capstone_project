@@ -1,0 +1,31 @@
+<!-- templates/registration_success.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration Successful</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 50px;
+        }
+        h1 {
+            color: #28a745;
+        }
+        p {
+            font-size: 18px;
+        }
+        a {
+            text-decoration: none;
+            color: #007bff;
+        }
+    </style>
+</head>
+<body>
+    <h1>Registration Successful!</h1>
+    <p>Welcome, {{ username }}! You have successfully registered.</p>
+    <p><a href="{% url 'login' %}">Click here to log in</a></p>
+</body>
+</html>
